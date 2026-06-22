@@ -1,0 +1,19 @@
+How to Run & Record
+# 1. Open terminal/command prompt
+# 2. Navigate to project folder
+cd safeguard-woman-mvp
+
+# 3. Install Flask
+pip install flask
+
+# 4. Create database
+python database.py
+
+# 5. Run the app
+python app.py
+
+# 6. Open browser and go to:
+#    http://localhost:5000
+
+# 7. Start screen recording (use OBS Studio - free)
+# 8. Follow the demo video script above
