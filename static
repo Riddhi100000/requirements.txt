@@ -1,0 +1,3 @@
+ static/                   ← CSS + JS files
+│   ├── style.css
+│   └── app.js
