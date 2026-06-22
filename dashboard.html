@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% block title %}SafeGuard AI - Dashboard{% endblock %}
+
+{% block body %}
+<!-- TOP NAVIGATION BAR -->
+<nav class="navbar">
+    <div class="nav-brand">🛡️ SafeGuard AI</div>
+    <div class="nav-right">
+        <span class="nav-user">👤 {{ user.full_name }}</span>
+        <a href="/logout" class="btn btn-small">Logout</a>
+    </div>
+</nav>
+
+<div class="dashboard-container">
+
+    <!-- ============================================ -->
+    <!-- SECTION 1: SOS BUTTON (Most Important!)      -->
+    <!-- ============================================ -->
+    <section class="sos-section">
+        <div class="sos-card">
+            <h2>🚨 Emergency SOS</h2>
+            <p>Press and hold for 3 seconds to trigger alert</p>
+            
+            <button id="sosButton" class="sos-button" 
+                    onmousedown="startSOS()" onmouseup="cancelSOS()"
+                    ontouchstart="startSOS()" ontouchend="cancelSOS()">
+                <span class="sos-icon">🆘</span>
+                <span class="sos-text">SOS</span>
+            </button>
+            
+            <div class="sos-progress">
+                <div id="sosProgress" class="sos-progress-bar"></div>
+            </div>
+            
+            <p id="sosStatus" class="sos-status"></p>
+        </div>
+
+        <!-- Voice Activated SOS -->
+        <div class="voice-card">
+            <h3>🎤 Voice Activated SOS</h3>
+            <p>Say "HELP" to trigger alert automatically</p>
+            <button id="voiceBtn" class="btn btn-secondary" onclick="toggleVoiceDetection()">
+                Start Listening
+            </button>
+            <div id="voiceStatus" class="voice-status">
+                <span id="voiceDot" class="dot dot-inactive"></span>
+                <span id="voiceText">Voice detection off</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SECTION 2: SAFETY CHECK-IN                   -->
+    <!-- ============================================ -->
+    <section class="checkin-section">
+        <div class="checkin-card">
+            <h3>✅ Safety Check-In</h3>
+            <p>Let your contacts know you're safe</p>
+            <div class="checkin-form">
+                <input type="text" id="checkinMessage" 
+                       placeholder="I'm safe, heading home..." class="input-field">
+                <button class="btn btn-green" onclick="doCheckin()">
+                    I'm Safe ✓
+                </button>
+            </div>
+            <div id="checkinResult" class="result-box hidden"></div>
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SECTION 3: LIVE LOCATION                     -->
+    <!-- ============================================ -->
+    <section class="location-section">
+        <div class="location-card">
+            <h3>📍 Live Location</h3>
+            <div id="mapPlaceholder" class="map-placeholder">
+                <p>Loading your location...</p>
+            </div>
+            <div id="locationInfo" class="location-info">
+                <p><strong>Latitude:</strong> <span id="lat">--</span></p>
+                <p><strong>Longitude:</strong> <span id="lng">--</span></p>
+                <p><strong>Address:</strong> <span id="address">--</span></p>
+            </div>
+            <button class="btn btn-secondary" onclick="refreshLocation()">
+                📍 Refresh Location
+            </button>
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SECTION 4: AUDIO EVIDENCE RECORDING          -->
+    <!-- ============================================ -->
+    <section class="record-section">
+        <div class="record-card">
+            <h3>🎙️ Evidence Recorder</h3>
+            <p>Record audio evidence securely</p>
+            <div class="record-controls">
+                <button id="recordBtn" class="btn btn-red" onclick="toggleRecording()">
+                    ⏺️ Start Recording
+                </button>
+                <span id="recordTimer" class="record-timer">00:00</span>
+            </div>
+            <audio id="audioPlayback" controls class="hidden"></audio>
+            <button id="uploadBtn" class="btn btn-primary hidden" onclick="uploadAudio()">
+                ☁️ Save Evidence to Cloud
+            </button>
+            <div id="uploadResult" class="result-box hidden"></div>
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SECTION 5: EMERGENCY CONTACTS                -->
+    <!-- ============================================ -->
+    <section class="contacts-section">
+        <div class="contacts-card">
+            <h3>📞 Emergency Contacts</h3>
+            <p>These people will be alerted when you trigger SOS</p>
+            
+            <!-- Add Contact Form -->
+            <div class="add-contact-form">
+                <input type="text" id="contactName" placeholder="Name" class="input-field">
+                <input type="tel" id="contactPhone" placeholder="Phone" class="input-field">
+                <select id="contactRelation" class="input-field">
+                    <option value="Parent">Parent</option>
+                    <option value="Sibling">Sibling</option>
+                    <option value="Spouse">Spouse</option>
+                    <option value="Friend">Friend</option>
+                    <option value="Other">Other</option>
+                </select>
+                <button class="btn btn-primary" onclick="addContact()">
+                    + Add Contact
+                </button>
+            </div>
+
+            <!-- Contact List -->
+            <div class="contact-list">
+                {% if contacts %}
+                    {% for contact in contacts %}
+                    <div class="contact-item">
+                        <div class="contact-info">
+                            <span class="contact-name">{{ contact.contact_name }}</span>
+                            <span class="contact-phone">{{ contact.contact_phone }}</span>
+                            <span class="contact-relation">{{ contact.relation }}</span>
+                        </div>
+                        <button class="btn btn-small btn-red" 
+                                onclick="deleteContact({{ contact.id }})">
+                            ✕
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="empty-msg">No contacts added yet. Add at least 2 trusted contacts!</p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SECTION 6: ALERT HISTORY                     -->
+    <!-- ============================================ -->
+    <section class="history-section">
+        <div class="history-card">
+            <h3>📋 Alert History</h3>
+            {% if alerts %}
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Evidence</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alert in alerts %}
+                        <tr>
+                            <td>{{ alert.created_at }}</td>
+                            <td>{{ alert.address or "N/A" }}</td>
+                            <td>
+                                <span class="badge badge-{{ alert.status }}">
+                                    {{ alert.status }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if alert.audio_file %}
+                                    ✅ Saved
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="empty-msg">No alerts triggered yet. Stay safe! 🙏</p>
+            {% endif %}
+        </div>
+    </section>
+
+</div>
+{% endblock %}
