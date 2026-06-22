@@ -1,6 +1,6 @@
 # 🛡️ SafeGuard AI - Women's Safety Platform
 
-**Team:** 2026  
+**Team:** riddhiagarwal10c 
 **Member:** Riddhi Agarwal  
 **Round:** 2 - Prototype Development
 
@@ -21,6 +21,26 @@ A women's safety platform with:
 | Backend | Python Flask |
 | Database | SQLite |
 | APIs | Geolocation, Speech Recognition, OpenStreetMap |
+
+safeguard-woman-mvp/
+│
+├── app.py                    ← Main backend server
+├── database.py               ← Database setup
+├── requirements.txt          ← Python packages needed
+├── README.md                 ← Setup instructions
+│
+├── templates/                ← HTML pages
+│   ├── base.html
+│   ├── login.html
+│   ├── register.html
+│   └── dashboard.html
+│
+├── static/                   ← CSS + JS files
+│   ├── style.css
+│   └── app.js
+│
+└── uploads/                  ← Audio recordings saved here
+    └── (auto-created)
 
 ## How to Run (Step by Step)
 
